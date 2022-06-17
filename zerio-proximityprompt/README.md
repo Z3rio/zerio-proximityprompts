@@ -20,7 +20,6 @@ exports["zerio-proximityprompt"]:AddNewPrompt({
 ```
 
 Removing a prompt:
-
 ```lua
 local prompt = exports["zerio-proximityprompt"]:AddNewPrompt({})
 

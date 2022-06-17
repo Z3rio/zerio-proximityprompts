@@ -169,11 +169,14 @@ Citizen.CreateThread(function()
         local resx, resy = GetActiveScreenResolution()
         local idx = -1
 
-        local noneInRange, noneOnScreen = true, true
+        local noneInRange, noneOnScreen, lowestdist = true, true, math.huge
 
         for i, v in pairs(prompts) do
             local v = prompts[i]
             local dist = #(plrpos - v.position)
+            if lowestdist > dist then
+                lowestdist = dist
+            end
             if dist < v.drawdist then
                 noneInRange = false
                 local onscreen, x, y = World3dToScreen2d(v.position.x, v.position.y, v.position.z)
@@ -240,7 +243,11 @@ Citizen.CreateThread(function()
         end
 
         if noneInRange == true then
-            Citizen.Wait(250)
+            local time = lowestdist * 10
+            if time > 1000 then
+                time = 1000
+            end
+            Citizen.Wait(time)
         end
     end
 end)
