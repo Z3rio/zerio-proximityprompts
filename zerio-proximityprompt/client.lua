@@ -211,12 +211,16 @@ Citizen.CreateThread(function()
 
                             while true do
                                 if not IsControlPressed(0, key) then
-                                    prompts[i].isbeingpressed = false
-                                    SendNUIMessage({
-                                        action = "stopholding",
-                                        idx = i
-                                    })
-                                    return
+                                    if prompts[i] then
+                                        prompts[i].isbeingpressed = false
+                                        SendNUIMessage({
+                                            action = "stopholding",
+                                            idx = i
+                                        })
+                                        return
+                                    else
+                                        return
+                                    end
                                 end
                                 Citizen.Wait(100)
                             end
