@@ -79,9 +79,14 @@ Citizen.CreateThread(function()
                 local subfuncs = {}
                 function subfuncs:Remove()
                     prompts[data.name] = nil
+                    SendNUIMessage({
+                        action = "removeprompt",
+                        name = data.name
+                    })
                 end
                 return subfuncs
             else
+                usagefuncs[data.name] = data.usage
                 print(string.format(
                     "ZERIO-PROXIMITYPROMPT [WARN] - There is already a proximity prompt with the id \"%s\"", data.name))
             end
