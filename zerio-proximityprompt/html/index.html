@@ -123,6 +123,17 @@
               Vue.set(viewmodel.prompts[index], "scale", event.data.data.scale);
             }
             break;
+          case "removeprompt":
+            var index = null;
+            for (var i = 0; i < viewmodel.prompts.length; i++) {
+              if (viewmodel.prompts[i].name == event.data.name) {
+                index = i;
+              }
+            }
+            if (index !== null) {
+              viewmodel.prompts.splice(index, 1);
+            }
+            break;
           case "startholding":
             var index = null;
             for (var i = 0; i < viewmodel.prompts.length; i++) {
