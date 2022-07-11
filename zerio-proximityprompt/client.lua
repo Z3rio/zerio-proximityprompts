@@ -9,7 +9,7 @@ Citizen.CreateThread(function()
         actiontext = "Interact with something",
         holdtime = 5000,
         key = "E",
-        position = vector3(0.0, 0.0, 0.0),
+        -- position = vector3(0.0, 0.0, 0.0),
         params = {"test", "data"},
         usage = function(data)
             print("Proximity prompt got used, the following params got passed: " .. json.encode(data))
@@ -49,6 +49,9 @@ Citizen.CreateThread(function()
         data.holding = false
         data.left = 0
         data.top = 0
+        if data.position then
+            data.position = vector3(data.position.x, data.position.y, data.position.z)
+        end
 
         if Keys[data.key] ~= nil then
             if prompts[data.name] == nil then
@@ -84,6 +87,26 @@ Citizen.CreateThread(function()
                         name = data.name
                     })
                 end
+
+                function subfuncs:Delete()
+                    prompts[data.name] = nil
+                    SendNUIMessage({
+                        action = "removeprompt",
+                        name = data.name
+                    })
+                end
+
+                function subfuncs:Update(values)
+                    for i, v in pairs(values) do
+                        if i == "key" then
+                            prompts[data.name][i] = string.upper(v)
+                        elseif i ~= "left" and i ~= "top" and i ~= "isbeingpressed" and i ~= "holding" and i ~=
+                            "visible" and i ~= "timeheld" then
+                            prompts[data.name][i] = v
+                        end
+                    end
+                end
+
                 return subfuncs
             else
                 usagefuncs[data.name] = data.usage
@@ -175,56 +198,68 @@ Citizen.CreateThread(function()
         local idx = -1
 
         local noneInRange, noneOnScreen, lowestdist = true, true, math.huge
+        local playerpos = GetEntityCoords(PlayerPedId())
 
         for i, v in pairs(prompts) do
             local v = prompts[i]
-            local dist = #(plrpos - v.position)
+            local position = v.position
+            if v.entity and not v.position then
+                position = GetEntityCoords(v.entity)
+            end
+
+            local dist = #(plrpos - position)
             if lowestdist > dist then
                 lowestdist = dist
             end
             if dist < v.drawdist then
                 noneInRange = false
-                local onscreen, x, y = World3dToScreen2d(v.position.x, v.position.y, v.position.z)
+                local onscreen, x, y = World3dToScreen2d(position.x, position.y, position.z)
                 if onscreen then
                     noneOnScreen = false
-                    prompts[i].left = (x * resx) * 0.75
-                    prompts[i].top = y * resy
-                    prompts[i].visible = true
-                    prompts[i].scale = (1 / dist)
+                    if IsPauseMenuActive() == false then
+                        prompts[i].left = (x * resx) * 0.75
+                        prompts[i].top = y * resy
+                        prompts[i].visible = true
+                        prompts[i].scale = (1 / dist)
 
-                    if prompts[i].scale > 1 then
-                        prompts[i].scale = 1
-                    end
-                    if prompts[i].scale < 0.5 then
-                        prompts[i].scale = 0.5
-                    end
+                        if prompts[i].scale > 1 then
+                            prompts[i].scale = 1
+                        end
+                        if prompts[i].scale < 0.5 then
+                            prompts[i].scale = 0.5
+                        end
 
-                    if IsControlPressed(0, Keys[v.key]) and prompts[i].isbeingpressed == false and v.usagedist > dist then
-                        prompts[i].isbeingpressed = true
-                        Citizen.CreateThread(function()
-                            local key = Keys[v.key]
+                        if IsControlPressed(0, Keys[v.key]) and prompts[i].isbeingpressed == false and v.usagedist >
+                            dist then
+                            if prompts[i] then
+                                prompts[i].isbeingpressed = true
+                            end
+                            Citizen.CreateThread(function()
+                                local key = Keys[v.key]
 
-                            SendNUIMessage({
-                                action = "startholding",
-                                idx = i
-                            })
+                                SendNUIMessage({
+                                    action = "startholding",
+                                    idx = i
+                                })
 
-                            while true do
-                                if not IsControlPressed(0, key) then
-                                    if prompts[i] then
-                                        prompts[i].isbeingpressed = false
-                                        SendNUIMessage({
-                                            action = "stopholding",
-                                            idx = i
-                                        })
-                                        return
-                                    else
+                                while true do
+                                    if not IsControlPressed(0, key) then
+                                        if prompts[i] then
+                                            prompts[i].isbeingpressed = false
+                                            SendNUIMessage({
+                                                action = "stopholding",
+                                                idx = i
+                                            })
+
+                                        end
                                         return
                                     end
+                                    Citizen.Wait(100)
                                 end
-                                Citizen.Wait(100)
-                            end
-                        end)
+                            end)
+                        end
+                    else
+                        prompts[i].visible = false
                     end
                 else
                     prompts[i].visible = false
