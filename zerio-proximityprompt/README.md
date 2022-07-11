@@ -1,4 +1,4 @@
-Example usage:
+## Example usage:
 (This includes all parameters, you can skip the ones you dont care about and it will just use the default value)
 
 ```lua
@@ -19,9 +19,36 @@ exports["zerio-proximityprompt"]:AddNewPrompt({
 })
 ```
 
-Removing a prompt:
+## Removing a prompt:
 ```lua
 local prompt = exports["zerio-proximityprompt"]:AddNewPrompt({})
 
-prompt:remove()
+prompt:Remove()
+```
+
+## Update a prompt:
+```lua
+local prompt = exports["zerio-proximityprompt"]:AddNewPrompt({})
+
+prompt:Update({
+    objecttext = "Test",
+    key = "Q"
+})
+```
+
+## Using it with an entity instead of a position:
+If you want to use an entity instead of a position you have to use the entity value instead of the position value.
+
+Old example with a prompt:
+```lua
+exports["zerio-proximityprompt"]:AddNewPrompt({
+    position = vector3(0.0, 0.0, 0.0)
+})
+```
+
+The same but changed to an entity:
+```lua
+exports["zerio-proximityprompt"]:AddNewPrompt({
+    entity = 8911106
+})
 ```
