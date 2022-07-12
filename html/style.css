@@ -1,0 +1,60 @@
+@import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap");
+
+body,
+html {
+  overflow: hidden;
+}
+
+.proximity-prompt {
+  position: absolute;
+
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+
+  width: fit-content;
+  height: fit-content;
+  max-width: 25%;
+
+  padding: 10px;
+  border-radius: 20px;
+  background: rgba(44, 44, 84, 0.875);
+  box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+}
+
+.text {
+  margin-left: 15px;
+  margin-right: 10px;
+}
+
+.proximity_prompt-subheader {
+  font-family: "Arial", sans-serif;
+  font-weight: 400;
+  color: #b7a9a7;
+  font-size: 20px;
+}
+
+.proximity_prompt-header {
+  font-family: "Lato", sans-serif;
+  font-weight: 400;
+  color: #e7dbd9;
+  font-size: 27.5px;
+}
+
+/* VUETIFY OVERWRITE */
+.v-progress-circular__underlay {
+  stroke: transparent !important;
+}
+
+.v-progress-circular__overlay {
+  fill: #24243b !important;
+  transition: all 0.1s linear;
+}
+
+.v-progress-circular__info {
+  z-index: 10;
+
+  font-family: "Montserrat", sans-serif;
+  font-size: 4vh;
+  font-weight: 600;
+}
