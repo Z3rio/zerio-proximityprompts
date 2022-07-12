@@ -49,8 +49,21 @@ Citizen.CreateThread(function()
         data.holding = false
         data.left = 0
         data.top = 0
+
+        if not data.offset or type(data.offset) ~= "vector3" then
+            data.offset = vector3(0.0, 0.0, 0.0)
+        end
+
         if data.position then
-            data.position = vector3(data.position.x, data.position.y, data.position.z)
+            data.position = vector3(data.position.x, data.position.y, data.position.z) + data.offset
+        end
+
+        if data.entity then
+            if DoesEntityExist(data.entity) == false then
+                print(string.format("ZERIO-PROXIMITYPROMPT [WARN] - The entity with the value \"%s\" does not exist",
+                    tostring(data.entity)))
+                return
+            end
         end
 
         if Keys[data.key] ~= nil then
@@ -204,7 +217,7 @@ Citizen.CreateThread(function()
             local v = prompts[i]
             local position = v.position
             if v.entity and not v.position then
-                position = GetEntityCoords(v.entity)
+                position = GetOffsetFromEntityInWorldCoords(v.entity, v.offset.x, v.offset.y, v.offset.z)
             end
 
             local dist = #(plrpos - position)
