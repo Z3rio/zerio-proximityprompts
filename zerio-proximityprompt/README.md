@@ -52,3 +52,11 @@ exports["zerio-proximityprompt"]:AddNewPrompt({
     entity = 8911106
 })
 ```
+
+## Entity offsets example:
+```lua
+exports["zerio-proximityprompt"]:AddNewPrompt({
+    entity = 837378,
+    offset = vector3(0.0, 1.0, 2.0)
+})
+```
