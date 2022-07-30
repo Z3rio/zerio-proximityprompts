@@ -153,19 +153,23 @@ Citizen.CreateThread(function()
         RegisterNetEvent("QBCore:Client:OnJobUpdate")
         AddEventHandler("QBCore:Client:OnJobUpdate", function()
             PlayerData = QBCore.Functions.GetPlayerData()
-            SendNUIMessage({
-                action = "updatejob",
-                job = PlayerData.job.name
-            })
+            if PlayerData and PlayerData.job then
+                SendNUIMessage({
+                    action = "updatejob",
+                    job = PlayerData.job.name
+                })
+            end
         end)
 
         RegisterNetEvent("QBCore:Client:OnPlayerLoaded")
         AddEventHandler("QBCore:Client:OnPlayerLoaded", function()
             PlayerData = QBCore.Functions.GetPlayerData()
-            SendNUIMessage({
-                action = "updatejob",
-                job = PlayerData.job.name
-            })
+            if PlayerData and PlayerData.job then
+                SendNUIMessage({
+                    action = "updatejob",
+                    job = PlayerData.job.name
+                })
+            end
         end)
     end
 
@@ -189,19 +193,23 @@ Citizen.CreateThread(function()
         RegisterNetEvent("esx:setJob")
         AddEventHandler("esx:setJob", function()
             PlayerData = ESX.GetPlayerData()
-            SendNUIMessage({
-                action = "updatejob",
-                job = PlayerData.job.name
-            })
+            if PlayerData and PlayerData.job then
+                SendNUIMessage({
+                    action = "updatejob",
+                    job = PlayerData.job.name
+                })
+            end
         end)
 
         RegisterNetEvent("esx:playerLoaded")
         AddEventHandler("esx:playerLoaded", function()
             PlayerData = ESX.GetPlayerData()
-            SendNUIMessage({
-                action = "updatejob",
-                job = PlayerData.job.name
-            })
+            if PlayerData and PlayerData.job then
+                SendNUIMessage({
+                    action = "updatejob",
+                    job = PlayerData.job.name
+                })
+            end
         end)
     end
 
