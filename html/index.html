@@ -37,7 +37,7 @@
           :style="{
             'left': prompt.left + 'px',
             'top': prompt.top + 'px',
-            'display': (prompt.job == undefined || ((typeof (prompt.job) == 'array' && prompt.find(job)) || (typeof (prompt.job) == 'string' && prompt.job == job))) && prompt.visible == true ? 'flex' : 'none',
+            'display': (prompt.job == undefined || ((typeof (prompt.job) == 'array' && prompt.find(job)) || (typeof (prompt.job) == 'string' && prompt.job == job))) && prompt.visible == true && (prompt.gang == undefined || ((typeof (prompt.gang) == 'array' && prompt.find(gang)) || (typeof (prompt.gang) == 'string' && prompt.gang == gang))) ? 'flex' : 'none',
             'transform': 'scale(' + prompt.scale + ')' 
           }"
         >
@@ -65,6 +65,7 @@
         data: {
           prompts: [],
           job: "",
+          gang: "",
           loaded: false,
         },
         methods: {},
@@ -170,6 +171,9 @@
             break;
           case "updatejob":
             viewmodel.job = event.data.job;
+            break;
+          case "updategang":
+            viewmodel.gang = event.data.gang;
             break;
           case "loaded":
             viewmodel.loaded = true;
