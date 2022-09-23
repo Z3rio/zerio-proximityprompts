@@ -1,7 +1,7 @@
 fx_version "cerulean"
 game "gta5"
 
-version "1.0.1"
+version "1.0.2"
 
 lua54 "yes"
 
@@ -16,3 +16,8 @@ server_scripts {"config.lua", "versioncheck.lua"}
 files {"html/libs/*.js", "html/style.css", "html/index.html"}
 
 ui_page "html/index.html"
+
+provides {
+    "zerio-proximityprompt",
+    "zerio-proximityprompts"
+}
