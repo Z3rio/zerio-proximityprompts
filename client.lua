@@ -170,14 +170,14 @@ Citizen.CreateThread(function()
         end
 
         RegisterNetEvent("esx:setJob")
-        AddEventHandler("esx:setJob", function()
-            PlayerData = ESX.GetPlayerData()
+        AddEventHandler("esx:setJob", function(Job)
+            PlayerData.job = Job
             SendNUIMessage({action = "updatejob", job = PlayerData.job.name})
         end)
 
         RegisterNetEvent("esx:playerLoaded")
-        AddEventHandler("esx:playerLoaded", function()
-            PlayerData = ESX.GetPlayerData()
+        AddEventHandler("esx:playerLoaded", function(xPlayer)
+            PlayerData = xPlayer
             SendNUIMessage({action = "updatejob", job = PlayerData.job.name})
         end)
     end
