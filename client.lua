@@ -188,7 +188,6 @@ Citizen.CreateThread(function()
         local idx = -1
 
         local noneInRange, noneOnScreen, lowestdist = true, true, math.huge
-        local playerpos = GetEntityCoords(PlayerPedId())
 
         for i, v in pairs(prompts) do
             local v = prompts[i]
