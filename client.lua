@@ -156,12 +156,13 @@ Citizen.CreateThread(function()
     end
 
     if GetResourceState("es_extended") ~= "missing" then
-        ESX = nil
-        while ESX == nil do
-            TriggerEvent("esx:getSharedObject", function(obj)
-                ESX = obj
-            end)
-            Citizen.Wait(0)
+        if ESX == nil then
+            while ESX == nil do
+                TriggerEvent("esx:getSharedObject", function(obj)
+                    ESX = obj
+                end)
+                Citizen.Wait(0)
+            end
         end
 
         PlayerData = ESX.GetPlayerData()
