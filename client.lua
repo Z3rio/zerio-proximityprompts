@@ -1,5 +1,6 @@
 Citizen.CreateThread(function()
-    local PlayerData = nil
+    local JobName = ""
+    local GangName = ""
     local loaded = false
     local prompts = {}
     local usagefuncs = {}
@@ -128,29 +129,32 @@ Citizen.CreateThread(function()
     if GetResourceState("qb-core") ~= "missing" then
         QBCore = exports["qb-core"]:GetCoreObject()
 
-        PlayerData = QBCore.Functions.GetPlayerData()
+        local PlayerData = QBCore.Functions.GetPlayerData()
         if PlayerData and PlayerData.job then
+            JobName = PlayerData.job.name
             SendNUIMessage({action = "updatejob", job = PlayerData.job.name})
         end
 
         if PlayerData and PlayerData.gang then
+            GangName = PlayerData.gang.name
             SendNUIMessage({action = "updategang", gang = PlayerData.gang.name})
         end
 
         RegisterNetEvent("QBCore:Client:OnJobUpdate")
         AddEventHandler("QBCore:Client:OnJobUpdate", function(JobInfo)
-            PlayerData.job = JobInfo
-            SendNUIMessage({action = "updatejob", job = PlayerData.job.name})
+            JobName = JobInfo.name
+            SendNUIMessage({action = "updatejob", job = JobInfo.name})
         end)
 
         RegisterNetEvent('QBCore:Client:OnGangUpdate', function(GangInfo)
-            PlayerData.gang = GangInfo
-            SendNUIMessage({action = "updategang", gang = PlayerData.gang.name})
+            GangName = GangInfo.name
+            SendNUIMessage({action = "updategang", gang = GangInfo.name})
         end)
 
         RegisterNetEvent("QBCore:Client:OnPlayerLoaded")
         AddEventHandler("QBCore:Client:OnPlayerLoaded", function()
-            PlayerData = QBCore.Functions.GetPlayerData()
+            local PlayerData = QBCore.Functions.GetPlayerData()
+            JobName = PlayerData.job.name
             SendNUIMessage({action = "updatejob", job = PlayerData.job.name})
         end)
     end
@@ -165,20 +169,21 @@ Citizen.CreateThread(function()
             end
         end
 
-        PlayerData = ESX.GetPlayerData()
+        local PlayerData = ESX.GetPlayerData()
         if PlayerData and PlayerData.job then
+            JobName = PlayerData.job.name
             SendNUIMessage({action = "updatejob", job = PlayerData.job.name})
         end
 
         RegisterNetEvent("esx:setJob")
         AddEventHandler("esx:setJob", function(Job)
-            PlayerData.job = Job
-            SendNUIMessage({action = "updatejob", job = PlayerData.job.name})
+            JobName = Job.name
+            SendNUIMessage({action = "updatejob", job = Job.name})
         end)
 
         RegisterNetEvent("esx:playerLoaded")
         AddEventHandler("esx:playerLoaded", function(xPlayer)
-            PlayerData = xPlayer
+            JobName = PlayerData.job.name
             SendNUIMessage({action = "updatejob", job = PlayerData.job.name})
         end)
     end
@@ -225,33 +230,39 @@ Citizen.CreateThread(function()
                             if IsControlPressed(0, Keys[v.key]) and
                                 prompts[i].isbeingpressed == false and
                                 v.usagedist > dist then
-                                if prompts[i] then
-                                    prompts[i].isbeingpressed = true
-                                end
-                                Citizen.CreateThread(function()
-                                    local key = Keys[v.key]
+                                if (prompts[i].job == nil or JobName ==
+                                    prompts[i].job) and
+                                    (prompts[i].gang == nil or GangName ==
+                                        prompts[i].gang) then
 
-                                    SendNUIMessage({
-                                        action = "startholding",
-                                        idx = i
-                                    })
-
-                                    while true do
-                                        if not IsControlPressed(0, key) then
-                                            if prompts[i] then
-                                                prompts[i].isbeingpressed =
-                                                    false
-                                                SendNUIMessage({
-                                                    action = "stopholding",
-                                                    idx = i
-                                                })
-
-                                            end
-                                            return
-                                        end
-                                        Citizen.Wait(100)
+                                    if prompts[i] then
+                                        prompts[i].isbeingpressed = true
                                     end
-                                end)
+                                    Citizen.CreateThread(function()
+                                        local key = Keys[v.key]
+
+                                        SendNUIMessage({
+                                            action = "startholding",
+                                            idx = i
+                                        })
+
+                                        while true do
+                                            if not IsControlPressed(0, key) then
+                                                if prompts[i] then
+                                                    prompts[i].isbeingpressed =
+                                                        false
+                                                    SendNUIMessage({
+                                                        action = "stopholding",
+                                                        idx = i
+                                                    })
+
+                                                end
+                                                return
+                                            end
+                                            Citizen.Wait(100)
+                                        end
+                                    end)
+                                end
                             end
                         else
                             prompts[i].visible = false
