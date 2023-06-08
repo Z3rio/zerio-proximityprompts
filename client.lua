@@ -182,7 +182,7 @@ Citizen.CreateThread(function()
         end)
 
         RegisterNetEvent("esx:playerLoaded")
-        AddEventHandler("esx:playerLoaded", function(xPlayer)
+        AddEventHandler("esx:playerLoaded", function(PlayerData)
             JobName = PlayerData.job.name
             SendNUIMessage({action = "updatejob", job = PlayerData.job.name})
         end)
