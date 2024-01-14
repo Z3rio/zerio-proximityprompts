@@ -1,17 +1,11 @@
 # Zerio Proximity Prompts
 
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/S2k_cC64QG8/0.jpg)](https://www.youtube.com/watch?v=S2k_cC64QG8)
-
 This is a simple to use proximity prompt library, which can act as a great
 alternative to GTA 5 Help Texts, Targetting Points, etc.
 
-**Please note: the examples below assume that you've renamed the directory to
-zerio-proximityprompt, aka without the S**
+[**Preview**](https://www.youtube.com/watch?v=S2k_cC64QG8)
 
-This repo still includes the s at the end in the name, as old links would break
-otherwise.
-
-## Example usage
+## Creating a prompt
 
 (This includes all parameters, you can skip the ones you dont care about and it
 will just use the default value)
