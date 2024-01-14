@@ -1,197 +1,185 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-    <script src="./libs/vue.js"></script>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
-    <link
-      href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css"
-      rel="stylesheet"
-    />
+  <script src="./libs/vue.js"></script>
 
-    <link
-      href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css"
-      rel="stylesheet"
-    />
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet" />
 
-    <link rel="stylesheet" href="style.css" type="text/css" />
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet" />
 
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui"
-    />
-  </head>
-  <body>
-    <v-app data-app>
-      <div id="app">
-        <div
-          v-for="(prompt, idx) in prompts"
-          class="proximity-prompt"
-          :style="{
+  <link rel="stylesheet" href="style.css" type="text/css" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui" />
+</head>
+
+<body>
+  <v-app data-app>
+    <div id="app">
+      <div v-for="(prompt, idx) in prompts" class="proximity-prompt" :style="{
             'left': prompt.left + 'px',
             'top': prompt.top + 'px',
             'display': (prompt.job == undefined || ((typeof (prompt.job) == 'array' && prompt.find(job)) || (typeof (prompt.job) == 'string' && prompt.job == job))) && prompt.visible == true && (prompt.gang == undefined || ((typeof (prompt.gang) == 'array' && prompt.find(gang)) || (typeof (prompt.gang) == 'string' && prompt.gang == gang))) ? 'flex' : 'none',
             'transform': 'scale(' + prompt.scale + ')' 
-          }"
-        >
-          <v-progress-circular
-            :rotate="-90"
-            :size="100"
-            :width="10"
-            :value="prompt.holdtime !== 0 ? (prompt.timeheld / prompt.holdtime) * 100 : 0"
-            color="#6060b1"
-          >
-            {{prompt.key}}
-          </v-progress-circular>
-          <div class="text">
-            <h1 class="proximity_prompt-subheader">{{prompt.objecttext}}</h1>
-            <h1 class="proximity_prompt-header">{{prompt.actiontext}}</h1>
-          </div>
+          }">
+        <v-progress-circular :rotate="-90" :size="100" :width="10"
+          :value="prompt.holdtime !== 0 ? (prompt.timeheld / prompt.holdtime) * 100 : 0" color="#6060b1">
+          {{prompt.key}}
+        </v-progress-circular>
+        <div class="text">
+          <h1 class="proximity_prompt-subheader">{{prompt.objecttext}}</h1>
+          <h1 class="proximity_prompt-header">{{prompt.actiontext}}</h1>
         </div>
       </div>
-    </v-app>
+    </div>
+  </v-app>
 
-    <script>
-      const viewmodel = new Vue({
-        el: "#app",
-        vuetify: new Vuetify(),
-        data: {
-          prompts: [],
-          job: "",
-          gang: "",
-          loaded: false,
+  <script>
+    const viewmodel = new Vue({
+      el: "#app",
+      vuetify: new Vuetify(),
+      data: {
+        prompts: [],
+        job: "",
+        gang: "",
+        loaded: false,
+      },
+      methods: {},
+      computed: {},
+    });
+
+    const getResourceName = () => {
+      try {
+        return GetParentResourceName();
+      } catch {
+        return "zerio-proximityprompt";
+      }
+    };
+
+    async function postRequest(evName, data = {}) {
+      const rawResp = await fetch(`https://${getResourceName()}/${evName}`, {
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json; charset=UTF8",
         },
-        methods: {},
-        computed: {},
+        method: "POST",
       });
 
-      function holding(idx) {
-        if (viewmodel.prompts[idx].holding == true) {
-          if (
-            viewmodel.prompts[idx].timeheld < viewmodel.prompts[idx].holdtime
-          ) {
-            viewmodel.prompts[idx].timeheld += 100;
-            setTimeout(() => {
-              holding(idx);
-            }, 100);
-          } else {
-            fetch("https://zerio-proximityprompt/triggercallback", {
-              method: "POST",
-              headers: {
-                accept: "application/json",
-              },
-              body: JSON.stringify({
-                name: viewmodel.prompts[idx].name,
-              }),
-            }).catch((result) => {});
+      return await rawResp.json();
+    }
 
-            viewmodel.prompts[idx].holding = false;
-            viewmodel.prompts[idx].timeheld = 0;
-            return;
+    function holding(idx) {
+      if (viewmodel.prompts[idx].holding == true) {
+        if (
+          viewmodel.prompts[idx].timeheld < viewmodel.prompts[idx].holdtime
+        ) {
+          viewmodel.prompts[idx].timeheld += 100;
+          setTimeout(() => {
+            holding(idx);
+          }, 100);
+        } else {
+          postRequest("triggercallback", {
+            name: viewmodel.prompts[idx].name,
+          });
+
+          viewmodel.prompts[idx].holding = false;
+          viewmodel.prompts[idx].timeheld = 0;
+          return;
+        }
+      } else {
+        return;
+      }
+    }
+
+    window.addEventListener("message", (event) => {
+      switch (event.data.action) {
+        case "addnewprompt":
+          viewmodel.prompts.push(event.data.data);
+          break;
+        case "updateprompt":
+          var index = null;
+          for (var i = 0; i < viewmodel.prompts.length; i++) {
+            if (viewmodel.prompts[i].name == event.data.idx) {
+              index = i;
+            }
           }
-        } else {
-          return;
-        }
+          if (index !== null && viewmodel.prompts[index] !== undefined) {
+            Vue.set(viewmodel.prompts[index], "left", event.data.data.left);
+            Vue.set(viewmodel.prompts[index], "top", event.data.data.top);
+            Vue.set(
+              viewmodel.prompts[index],
+              "visible",
+              event.data.data.visible,
+            );
+            Vue.set(viewmodel.prompts[index], "scale", event.data.data.scale);
+          }
+          break;
+        case "removeprompt":
+          var index = null;
+          for (var i = 0; i < viewmodel.prompts.length; i++) {
+            if (viewmodel.prompts[i].name == event.data.name) {
+              index = i;
+            }
+          }
+          if (index !== null) {
+            viewmodel.prompts.splice(index, 1);
+          }
+          break;
+        case "startholding":
+          var index = null;
+          for (var i = 0; i < viewmodel.prompts.length; i++) {
+            if (viewmodel.prompts[i].name == event.data.idx) {
+              index = i;
+            }
+          }
+
+          if (viewmodel.prompts[index].holdtime !== 0) {
+            viewmodel.prompts[index].holding = true;
+            holding(index);
+          } else {
+            postRequest("triggercallback", {
+              name: viewmodel.prompts[index].name,
+            });
+          }
+          break;
+        case "stopholding":
+          var index = null;
+          for (var i = 0; i < viewmodel.prompts.length; i++) {
+            if (viewmodel.prompts[i].name == event.data.idx) {
+              index = i;
+            }
+          }
+
+          viewmodel.prompts[index].holding = false;
+          viewmodel.prompts[index].timeheld = 0;
+          break;
+        case "updatejob":
+          viewmodel.job = event.data.job;
+          break;
+        case "updategang":
+          viewmodel.gang = event.data.gang;
+          break;
+        case "loaded":
+          viewmodel.loaded = true;
+          break;
       }
+    });
 
-      window.addEventListener("message", (event) => {
-        switch (event.data.action) {
-          case "addnewprompt":
-            viewmodel.prompts.push(event.data.data);
-            break;
-          case "updateprompt":
-            var index = null;
-            for (var i = 0; i < viewmodel.prompts.length; i++) {
-              if (viewmodel.prompts[i].name == event.data.idx) {
-                index = i;
-              }
-            }
-            if (index !== null && viewmodel.prompts[index] !== undefined) {
-              Vue.set(viewmodel.prompts[index], "left", event.data.data.left);
-              Vue.set(viewmodel.prompts[index], "top", event.data.data.top);
-              Vue.set(
-                viewmodel.prompts[index],
-                "visible",
-                event.data.data.visible
-              );
-              Vue.set(viewmodel.prompts[index], "scale", event.data.data.scale);
-            }
-            break;
-          case "removeprompt":
-            var index = null;
-            for (var i = 0; i < viewmodel.prompts.length; i++) {
-              if (viewmodel.prompts[i].name == event.data.name) {
-                index = i;
-              }
-            }
-            if (index !== null) {
-              viewmodel.prompts.splice(index, 1);
-            }
-            break;
-          case "startholding":
-            var index = null;
-            for (var i = 0; i < viewmodel.prompts.length; i++) {
-              if (viewmodel.prompts[i].name == event.data.idx) {
-                index = i;
-              }
-            }
-
-            if (viewmodel.prompts[index].holdtime !== 0) {
-              viewmodel.prompts[index].holding = true;
-              holding(index);
-            } else {
-              fetch("https://zerio-proximityprompt/triggercallback", {
-                method: "POST",
-                headers: {
-                  accept: "application/json",
-                },
-                body: JSON.stringify({
-                  name: viewmodel.prompts[index].name,
-                }),
-              }).catch((result) => {});
-            }
-            break;
-          case "stopholding":
-            var index = null;
-            for (var i = 0; i < viewmodel.prompts.length; i++) {
-              if (viewmodel.prompts[i].name == event.data.idx) {
-                index = i;
-              }
-            }
-
-            viewmodel.prompts[index].holding = false;
-            viewmodel.prompts[index].timeheld = 0;
-            break;
-          case "updatejob":
-            viewmodel.job = event.data.job;
-            break;
-          case "updategang":
-            viewmodel.gang = event.data.gang;
-            break;
-          case "loaded":
-            viewmodel.loaded = true;
-            break;
-        }
-      });
-
-      function waitforload() {
-        if (viewmodel.loaded == false) {
-          fetch("https://zerio-proximityprompt/loaded", {}).catch(
-            (result) => {}
-          );
-          setTimeout(waitforload, 500);
-        } else {
-          return;
-        }
+    function waitforload() {
+      if (viewmodel.loaded == false) {
+        postRequest("loaded", {});
+        setTimeout(waitforload, 500);
+      } else {
+        return;
       }
-      waitforload();
-    </script>
-  </body>
+    }
+    waitforload();
+  </script>
+</body>
+
 </html>

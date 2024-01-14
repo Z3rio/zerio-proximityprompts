@@ -19,7 +19,9 @@ html {
   padding: 10px;
   border-radius: 20px;
   background: rgba(44, 44, 84, 0.875);
-  box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+  box-shadow:
+    rgba(0, 0, 0, 0.19) 0px 10px 20px,
+    rgba(0, 0, 0, 0.23) 0px 6px 6px;
 }
 
 .text {
