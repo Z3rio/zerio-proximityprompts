@@ -1,6 +1,11 @@
-https://youtu.be/S2k_cC64QG8
+# Zerio Proximity Prompts
 
-## Example usage:
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/S2k_cC64QG8/0.jpg)](https://www.youtube.com/watch?v=S2k_cC64QG8)
+
+This is a simple to use proximity prompt library, which can act as a great alternative to GTA 5 Help Texts, Targetting Points, etc.
+
+## Example usage
+
 (This includes all parameters, you can skip the ones you dont care about and it will just use the default value)
 
 ```lua
@@ -13,7 +18,8 @@ exports["zerio-proximityprompt"]:AddNewPrompt({
     key = "E", -- key to press
     position = vector3(0.0, 0.0, 0.0), -- position of the proximity prompt
     params = {"test", "data"}, -- this gets passed through into the usage callback as shown below
-    usage = function(data) -- function which gets executed when you use the proximity prompt
+    usage = function(data, actions) -- function which gets executed when you use the proximity prompt
+        -- actions is the same object which gets returned from `AddNewPrompt`, meaning you can use :Remove, :Update, and such on it.
         print("Proximity prompt got used, the following params got passed: " .. json.encode(data))
     end,
     drawdist = 3, -- max distance to see the prompt
@@ -21,14 +27,16 @@ exports["zerio-proximityprompt"]:AddNewPrompt({
 })
 ```
 
-## Removing a prompt:
+## Removing a prompt
+
 ```lua
 local prompt = exports["zerio-proximityprompt"]:AddNewPrompt({})
 
 prompt:Remove()
 ```
 
-## Update a prompt:
+## Updating a prompt
+
 ```lua
 local prompt = exports["zerio-proximityprompt"]:AddNewPrompt({})
 
@@ -38,10 +46,12 @@ prompt:Update({
 })
 ```
 
-## Using it with an entity instead of a position:
+## Using it with an entity instead of a position
+
 If you want to use an entity instead of a position you have to use the entity value instead of the position value.
 
 Old example with a prompt:
+
 ```lua
 exports["zerio-proximityprompt"]:AddNewPrompt({
     position = vector3(0.0, 0.0, 0.0)
@@ -49,13 +59,15 @@ exports["zerio-proximityprompt"]:AddNewPrompt({
 ```
 
 The same but changed to an entity:
+
 ```lua
 exports["zerio-proximityprompt"]:AddNewPrompt({
     entity = 8911106
 })
 ```
 
-## Entity offsets example:
+## Entity offsets example
+
 ```lua
 exports["zerio-proximityprompt"]:AddNewPrompt({
     entity = 837378,

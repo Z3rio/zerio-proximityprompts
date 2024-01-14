@@ -11,8 +11,8 @@ Citizen.CreateThread(function()
         holdtime = 5000,
         key = "E",
         -- position = vector3(0.0, 0.0, 0.0),
-        params = {"test", "data"},
-        usage = function(data)
+        params = {},
+        usage = function(data, actions)
             print(
                 "Proximity prompt got used, the following params got passed: " ..
                     json.encode(data))
@@ -22,15 +22,42 @@ Citizen.CreateThread(function()
     }
 
     RegisterNUICallback("triggercallback", function(data, cb)
-        usagefuncs[data.name](prompts[data.name].params)
-        cb()
+        usagefuncs[data.name](prompts[data.name].params, GetSubFunctions(data.name))
+        cb("ok")
     end)
 
-    RegisterNUICallback("loaded", function(data, cb)
+    RegisterNUICallback("loaded", function(_data, cb)
         loaded = true
         SendNUIMessage({action = "loaded"})
-        cb()
+        cb("ok")
     end)
+
+    function GetSubFunctions(name)
+        local subfuncs = {}
+        function subfuncs:Remove()
+            prompts[name] = nil
+            SendNUIMessage({action = "removeprompt", name = name})
+        end
+
+        function subfuncs:Delete()
+            prompts[name] = nil
+            SendNUIMessage({action = "removeprompt", name = name})
+        end
+
+        function subfuncs:Update(values)
+            for i, v in pairs(values) do
+                if i == "key" then
+                    prompts[name][i] = string.upper(v)
+                elseif i ~= "left" and i ~= "top" and i ~=
+                    "isbeingpressed" and i ~= "holding" and i ~=
+                    "visible" and i ~= "timeheld" then
+                    prompts[name][i] = v
+                end
+            end
+        end
+
+        return subfuncs
+    end
 
     function AddNewPrompt(data)
         if data == nil then data = defaultdata end
@@ -81,34 +108,10 @@ Citizen.CreateThread(function()
                             Citizen.Wait(1000)
                         end
                         SendNUIMessage({action = "addnewprompt", data = data})
-                        return
                     end)
                 end
 
-                local subfuncs = {}
-                function subfuncs:Remove()
-                    prompts[data.name] = nil
-                    SendNUIMessage({action = "removeprompt", name = data.name})
-                end
-
-                function subfuncs:Delete()
-                    prompts[data.name] = nil
-                    SendNUIMessage({action = "removeprompt", name = data.name})
-                end
-
-                function subfuncs:Update(values)
-                    for i, v in pairs(values) do
-                        if i == "key" then
-                            prompts[data.name][i] = string.upper(v)
-                        elseif i ~= "left" and i ~= "top" and i ~=
-                            "isbeingpressed" and i ~= "holding" and i ~=
-                            "visible" and i ~= "timeheld" then
-                            prompts[data.name][i] = v
-                        end
-                    end
-                end
-
-                return subfuncs
+                return GetSubFunctions(data.name)
             else
                 usagefuncs[data.name] = data.usage
                 print(string.format(
